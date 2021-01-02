@@ -7,6 +7,8 @@
 void scanPorts();
 void check_if_exist_I2C();
 
+ADS1115 adc0(ADS1115_ADDRESS_ADDR_GND); 
+
 void setup() {
   Serial.begin(115200);
   // connect to WiFi
@@ -52,57 +54,27 @@ void setup() {
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
 
-  scanPorts();
+  Wire.begin(25,26);
+  Serial.println("Initializing I2C devices..."); 
+  adc0.initialize(); // initialize ADS1115 16 bit A/D chip
+    
+  Serial.println("Testing device connections...");
+  //TODO: fail at this point
+  Serial.println(adc0.testConnection() ? "ADS1115 connection successful" : "ADS1115 connection failed");
+
+  adc0.setMode(ADS1115_MODE_CONTINUOUS);
 }
 
 void loop() {
-  
-}
+    adc0.setGain(ADS1115_PGA_4P096);
 
-uint8_t portArray[] = {25,26};
-String portMap[] = {"GPIO25", "GPIO26"};
-
-void scanPorts() { 
-  for (uint8_t i = 0; i < sizeof(portArray); i++) {
-    for (uint8_t j = 0; j < sizeof(portArray); j++) {
-      if (i != j){
-        Serial.print("Scanning (SDA : SCL) - " + portMap[i] + " : " + portMap[j] + " - ");
-        Wire.begin(portArray[i], portArray[j]);
-        check_if_exist_I2C();
-      }
+    while(true) {
+      float readingVolts=adc0.getConversionP0GND()*adc0.getMvPerCount();
+      Serial.println(readingVolts);
+      delay(500);
     }
-  }
+
+
+
 }
 
-void check_if_exist_I2C() {
-  byte error, address;
-  int nDevices;
-  nDevices = 0;
-  for (address = 1; address < 127; address++ )  {
-    // The i2c_scanner uses the return value of
-    // the Write.endTransmisstion to see if
-    // a device did acknowledge to the address.
-    Wire.beginTransmission(address);
-    error = Wire.endTransmission();
-
-    if (error == 0){
-      Serial.print("I2C device found at address 0x");
-      if (address < 16)
-        Serial.print("0");
-      Serial.print(address, HEX);
-      Serial.println("  !");
-
-      nDevices++;
-    } else if (error == 4) {
-      Serial.print("Unknow error at address 0x");
-      if (address < 16)
-        Serial.print("0");
-      Serial.println(address, HEX);
-    }
-  } //for loop
-  if (nDevices == 0)
-    Serial.println("No I2C devices found");
-  else
-    Serial.println("**********************************\n");
-  //delay(1000);           // wait 1 seconds for next scan, did not find it necessary
-}
