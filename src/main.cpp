@@ -1,6 +1,6 @@
 #include "Arduino.h"
 #include "WiFi.h"
-#include "passwords.h"
+#include "config.h"
 #include "Wire.h"
 #include "ADS1115.h"
 
@@ -66,11 +66,30 @@ void setup() {
 }
 
 void loop() {
-    adc0.setGain(ADS1115_PGA_4P096);
+    
 
     while(true) {
+      //Voltage divider is 6.7k --> 1k
+      //therefore when total voltage = 13v
+      //   (6700 + 1000) = 7700
+      //   7700/1000 = 7.7
+      //   7.7 * 1697 = 13067mv
+
+
+      adc0.setGain(ADS1115_PGA_4P096);
       float readingVolts=adc0.getConversionP0GND()*adc0.getMvPerCount();
-      Serial.println(readingVolts);
+      Serial.print("Raw:");
+      Serial.print(readingVolts);
+      Serial.print("   Voltage:");
+      Serial.println(((6700.0+1000.0)/1000.0) * readingVolts / 1000);
+
+      adc0.setGain(ADS1115_PGA_0P256);
+      float readingCurrent=adc0.getConversionP1GND()*adc0.getMvPerCount();
+      Serial.print("Raw: ");
+      Serial.println(readingCurrent);
+      Serial.print("    Current (A):");
+      Serial.println(readingCurrent * (75.0/50.0));
+
       delay(500);
     }
 
