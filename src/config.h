@@ -7,6 +7,9 @@ const char* houseWiFiPassword = "nowireshere";
 const char* mobileWiFiSsid = "SScoltock";
 const char* mobileWiFiPassword = "scolly99";
 
+const char* ssid = "scoltock";
+const char* pass = "nowireshere";
+
 
 
 /**
@@ -15,7 +18,7 @@ const char* mobileWiFiPassword = "scolly99";
  * navigating to IoT Devices tab on the left, and creating (or selecting an existing) IoT Device. 
  * Then click on the named Device ID, and you will have able to copy the Primary or Secondary Device Connection String to this sample.
  */
-#define DEVICE_CONNECTION_STRING    "your-iothub-DEVICE-connection-string"
+#define DEVICE_CONNECTION_STRING    "HostName=srstraininghub.azure-devices.net;DeviceId=esp1;SharedAccessKey=qJdsnbL1AY460d9x07zGLzR2PhmizH9pH0LNc2jrFms="
 
 // The protocol you wish to use should be uncommented
 //
